@@ -80,6 +80,9 @@ main img {
     max-width: 100%;
     height: auto;
 }
+main .card {
+    padding: 10%;
+}
 
 /*End Main Styles*/
 

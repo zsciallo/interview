@@ -68,6 +68,7 @@ function render(parent, products){
 	for(let i = 0; i < products.length; i++){
 		//container
 		const div = document.createElement("div");
+		div.classList.add("card");
 
 		//content
 		const img = document.createElement("img");
@@ -102,10 +103,12 @@ function formatPrice(price){
 
 //Search
 function search(products, substring){
+	substring = substring.toLowerCase();
 	//could use .fliter for more readable code. 
 	let prods = [];
 	for (let i = 0; i < products.length; i ++){
-		if (products[i].title.includes(substring)){
+		const title = products[i].title.toLowerCase();
+		if (title.includes(substring)){
 			prods.push(products[i]);
 		}
 	}
