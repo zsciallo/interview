@@ -2,19 +2,18 @@ window.addEventListener("DOMContentLoaded", setup);
 
 async function setup() {
 	// DONE: Fetch products from the API
-	const products = await getProducts("/products");
+	let products = await getProducts("/products");
 
 	//No point in proceeding if we don't have data.
-	if(products == null){
-		return;
-	}
+	if(products == null){return;}
 	//Proceed
 
-	// TODO: Sort the products by price (low to high by default)
+	// DONE: Sort the products by price (low to high by default)
+	products = sort(products); //Don't need 'asc' here because case statement defaults to asc
 
 	// DONE: Render the products to the page in a responsive grid
 	const productParent = document.getElementById("products");
-	render(productParent, sort(products));
+	render(productParent, products);
 	
 
 	//DONE : Implement search functionality
