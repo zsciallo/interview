@@ -1,16 +1,105 @@
 window.addEventListener("DOMContentLoaded", setup);
 
 async function setup() {
-	// START HERE
-	// API Endpoint: GET /products
-	// Returns: Array of product objects with id, title, price (in cents), and array of images
-	// TODO: Fetch products from the API
-	// TODO: Render the products to the page in a responsive grid
+	// DONE: Fetch products from the API
+	const products = await getProducts("/products");
+
+	//No point in proceeding if we don't have data.
+	if(products.length === 0){
+		return;
+	}
+	//Proceed
+
 	// TODO: Sort the products by price (low to high by default)
+
+	// DONE: Render the products to the page in a responsive grid
+	const productParent = document.getElementById("products");
+	render(productParent, sort(products));
+	
+
 	// TODO: Implement search functionality
-	// BONUS: Use the refactored sorting function for dynamic sort order
-	// BONUS: Add error handling for the fetch request
+	const searchBar = document.getElementById('search-bar');
+	searchBar.addEventListener('input', (e) => {
+		search(products, e.target.value, productParent);
+	});
+	 
+
+
+	// DONE: Use the refactored sorting function for dynamic sort order
 }
+
+
+// API Endpoint: GET /products
+// Returns: Array of product objects with id, title, price (in cents), and array of images
+// Error handling, will return an empty array if something went wrong
+async function getProducts(endpoint){
+	try {
+    const data = await fetch(endpoint);
+	const prods = await data.json();
+	return prods;
+	}
+	// BONUS: Add error handling for the fetch request
+	catch (error){
+		alert(error);
+		return [];
+	}
+}
+//Render Products
+//Takes an array of products and a parent element, returns nothing
+function render(parent, products){
+	//destroy any children for re renders
+	while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  	}
+
+	//create a container that has image and text data, then append to our grid parent
+	for(let i = 0; i < products.length; i++){
+		//container
+		const div = document.createElement("div");
+
+		//content
+		const img = document.createElement("img");
+		img.src = products[i].images[0].src;
+		div.appendChild(img);
+
+		const h2 = document.createElement("h2");
+		h2.textContent = products[i].title;
+		div.appendChild(h2);
+
+		const price = document.createElement("h3");
+		price.textContent = formatPrice(products[i].price);
+		div.appendChild(price);
+
+		//push
+		parent.appendChild(div);
+	}
+	return;
+}
+
+//Render Helper Functions
+//Takes a price in cents (int) and returns a formatted string in dollars to display to the user
+function formatPrice(price){
+	let str = price.toString();
+	const str1 = str.slice(0, str.length-2);
+	const str2 = str.slice(str.length-2);
+	return (str = "$" + str1 + "." + str2);
+	
+}
+//End Render
+
+//Search
+function search(products, substring, parent){
+	let prods = [];
+	for (let i = 0; i < products.length; i ++){
+		if (products[i].title.includes(substring)){
+			prods.push(products[i]);
+		}
+	}
+	render(parent, prods);
+	return;
+}
+
+
 /**
  * Sorts an array of products by price in ascending or descending order.
  *
@@ -31,19 +120,62 @@ async function setup() {
  * @param {string} sortOrder - Either "asc" for ascending or "desc" for descending sort order.
  * @returns {Array} - A new array of products sorted by price in the specified order.
  */
-function messyFunction(data1, data2) {
-	let t = [];
-	for (let i = 0; i < data1.length; i++) {
-		t.push(data1[i]);
+function sort(products, sortOrder) { //renaming data1 and data2 to reflect what they actually are
+	//Original func appears to be swap sort, double nested for loop: O(n^2), could probably do better with quick sort or another lower time complexity algo
+
+	//iterating through data1 then pushing data1[i] to t is not needed. Adds O(n) complexity.
+	// let t = [];
+	// for (let i = 0; i < data1.length; i++) {
+	// 	t.push(data1[i]);
+	// }
+	let prods = [...products];
+
+	switch(sortOrder){
+		case "asc":
+			sortAsc(prods);
+			break;
+		case "desc":
+			sortDesc(prods);
+			break;
+		default:
+			sortAsc(prods);
+			break;
 	}
-	for (let i = 0; i < t.length; i++) {
-		for (let j = i + 1; j < t.length; j++) {
-			if ((data2 === "asc" && t[i].price > t[j].price) || (data2 === "desc" && t[i].price < t[j].price)) {
-				let tmp = t[i];
-				t[i] = t[j];
-				t[j] = tmp;
+
+			// if ((sortOrder === "asc" && products[i].price > products[j].price) || (sortOrder === "desc" && products[i].price < products[j].price)) { 
+			//this introduces overhead of checking every loop if we are asc, or desc, wrapping our loop in a case statement is simplier, cleaner, and more readable.
+
+				// let tmp = products[i];
+				// products[i] = products[j];
+				// products[j] = tmp;
+
+				//can achieve the same thing but make it cleaner and less confusing using helper function and better syntax for readability
+				//swap(products, i, j);
+
+	return prods;	
+}
+
+//swap(a,b) would be clean, but need to pass array by ref to avoid assigns in our main sort func
+function swap(array, a, b){
+	[array[a], array[b]] = [array[b], array[a]];
+}
+
+//sort helpers for cleaner modular code
+function sortAsc(products){
+	for (let i = 0; i < products.length; i++) {
+		for (let j = i + 1; j < products.length; j++) {
+			if(products[i].price > products[j].price){
+				swap(products, i, j);
 			}
 		}
 	}
-	return t;
+}
+function sortDesc(products){
+	for (let i = 0; i < products.length; i++) {
+		for (let j = i + 1; j < products.length; j++) {
+			if(products[i].price < products[j].price){
+				swap(products, i, j);
+			}
+		}
+	}
 }

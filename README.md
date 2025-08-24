@@ -1,3 +1,4 @@
+# Changes/Documentation provided in CHANGELOG.md
 # Welcome!
 
 Thanks for your interest in joining the SavedBy team! If you're reading this, you're on the right track!
