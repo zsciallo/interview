@@ -13,8 +13,9 @@ All changes are documented in this file
 - Sort the products by price (low to high by default), THEN
 - Renders grid to page 
 - Simple error handling using try catch
-- messyFunction renamed to sort and optimized style, modularity, readability, time complexity not touched
+- messyFunction renamed to sort and optimized style, modularity, readability, es6 .sort() used for readability
 - Real time case sensitive search implimented
+- More error handling added in fetching incase data is null
 ### Fixed
 - cart.svg appeared to be damaged, fixed using a svg tag from a known working .svg file
 ### Notes
