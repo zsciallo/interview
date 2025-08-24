@@ -9,15 +9,14 @@ All changes are documented in this file
 - index.html page populated
 - index.css page populated
 #### App.js
-- Fetchs data from /product
-- Sort the products by price (low to high by default), THEN
-- Renders grid to page 
-- Simple error handling using try catch
-- messyFunction renamed to sort and optimized style, modularity, readability, es6 .sort() used for readability
-- Real time case sensitive search implimented
-- More error handling added in fetching incase data is null
+- Fetches data from /product
+- Sorts the products by price (low to high by default)
+- Renders grid to page
+- Simple error handling using try catch, extra handling added in case data is null, but promise is fulfilled
+- messyFunction renamed to sort and optimized style, modularity, readability, .sort() used for readability
+- Real-time case-sensitive search implemented
 ### Fixed
-- cart.svg appeared to be damaged, fixed using a svg tag from a known working .svg file
+- cart.svg appeared to be damaged, fixed using an svg tag from a known working .svg file
 ### Notes
 - px breakpoint for styles is currently at 700 for ease of testing on desktop
 ### Time Spent
