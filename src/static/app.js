@@ -5,7 +5,7 @@ async function setup() {
 	const products = await getProducts("/products");
 
 	//No point in proceeding if we don't have data.
-	if(products.length === 0){
+	if(products == null){
 		return;
 	}
 	//Proceed
@@ -17,10 +17,11 @@ async function setup() {
 	render(productParent, sort(products));
 	
 
-	// TODO: Implement search functionality
+	//DONE : Implement search functionality
 	const searchBar = document.getElementById('search-bar');
 	searchBar.addEventListener('input', (e) => {
-		search(products, e.target.value, productParent);
+		let searchReturn = search(products, e.target.value);
+		render(render(productParent, searchReturn));
 	});
 	 
 
@@ -35,22 +36,33 @@ async function setup() {
 async function getProducts(endpoint){
 	try {
     const data = await fetch(endpoint);
-	const prods = await data.json();
+	const prods = await data?.json();
+
+	//data doesnt exist, move into try catch.
+	if (prods == null) {
+		throw "Data set empty";
+	}
 	return prods;
 	}
 	// BONUS: Add error handling for the fetch request
 	catch (error){
+		//steps I would take on prod code
+		// 1. write to external error log (grafana or similar)
+		// 2. wrtie internal error log
+		// 3. send end-user non security compromising msg
 		alert(error);
-		return [];
+		return null;
 	}
 }
 //Render Products
 //Takes an array of products and a parent element, returns nothing
 function render(parent, products){
 	//destroy any children for re renders
-	while (parent.firstChild) {
+	while (parent?.firstChild) {
     parent.removeChild(parent.firstChild);
   	}
+
+	if (!products?.length){return;} //Don't need to render on 0 prods
 
 	//create a container that has image and text data, then append to our grid parent
 	for(let i = 0; i < products.length; i++){
@@ -78,25 +90,26 @@ function render(parent, products){
 
 //Render Helper Functions
 //Takes a price in cents (int) and returns a formatted string in dollars to display to the user
+//Expects dollar ammount to be > 0
 function formatPrice(price){
 	let str = price.toString();
 	const str1 = str.slice(0, str.length-2);
 	const str2 = str.slice(str.length-2);
-	return (str = "$" + str1 + "." + str2);
+	return str = "$" + str1 + "." + str2;
 	
 }
 //End Render
 
 //Search
-function search(products, substring, parent){
+function search(products, substring){
+	//could use .fliter for more readable code. 
 	let prods = [];
 	for (let i = 0; i < products.length; i ++){
 		if (products[i].title.includes(substring)){
 			prods.push(products[i]);
 		}
 	}
-	render(parent, prods);
-	return;
+	return prods;
 }
 
 
@@ -132,13 +145,13 @@ function sort(products, sortOrder) { //renaming data1 and data2 to reflect what 
 
 	switch(sortOrder){
 		case "asc":
-			sortAsc(prods);
+			prods.sort((a, b) => a.price - b.price);
 			break;
 		case "desc":
-			sortDesc(prods);
+			prods.sort((a, b) => b.price - a.price);
 			break;
 		default:
-			sortAsc(prods);
+			prods.sort((a, b) => a.price - b.price);
 			break;
 	}
 
@@ -161,21 +174,22 @@ function swap(array, a, b){
 }
 
 //sort helpers for cleaner modular code
-function sortAsc(products){
-	for (let i = 0; i < products.length; i++) {
-		for (let j = i + 1; j < products.length; j++) {
-			if(products[i].price > products[j].price){
-				swap(products, i, j);
-			}
-		}
-	}
-}
-function sortDesc(products){
-	for (let i = 0; i < products.length; i++) {
-		for (let j = i + 1; j < products.length; j++) {
-			if(products[i].price < products[j].price){
-				swap(products, i, j);
-			}
-		}
-	}
-}
+// Ending up using ES6 .sort for more modern readable code, leaving this code in since this is where my thoughts went
+// function sortAsc(products){
+// 	for (let i = 0; i < products.length; i++) {
+// 		for (let j = i + 1; j < products.length; j++) {
+// 			if(products[i].price > products[j].price){
+// 				swap(products, i, j);
+// 			}
+// 		}
+// 	}
+// }
+// function sortDesc(products){
+// 	for (let i = 0; i < products.length; i++) {
+// 		for (let j = i + 1; j < products.length; j++) {
+// 			if(products[i].price < products[j].price){
+// 				swap(products, i, j);
+// 			}
+// 		}
+// 	}
+// }
